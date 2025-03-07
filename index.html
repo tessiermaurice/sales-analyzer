@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV File Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-container {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV File Analyzer</h1>
+    
+    <div class="upload-container">
+        <input type="file" id="csvFile" accept=".csv">
+        <button class="button" onclick="handleFileUpload()">Analyze CSV</button>
+    </div>
+
+    <div id="result" class="result-container">
+        <h2>Analysis Results:</h2>
+        <div id="resultContent"></div>
+    </div>
+
+    <script>
+        function handleFileUpload() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+
+            if (!file) {
+                alert('Please select a CSV file first!');
+                return;
+            }
+
+            if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+                alert('Please upload a CSV file!');
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const csvData = event.target.result;
+                const rows = csvData.split('\n');
+                const headers = rows[0].split(',');
+                
+                // Basic analysis
+                const analysis = {
+                    totalRows: rows.length - 1, // -1 for header row
+                    totalColumns: headers.length,
+                    columnNames: headers
+                };
+
+                // Display results
+                let htmlContent = `
+                    <p><strong>Number of rows:</strong> ${analysis.totalRows}</p>
+                    <p><strong>Number of columns:</strong> ${analysis.totalColumns}</p>
+                    <p><strong>Column names:</strong></p>
+                    <ul>
+                        ${analysis.columnNames.map(col => `<li>${col.trim()}</li>`).join('')}
+                    </ul>
+                `;
+
+                resultContent.innerHTML = htmlContent;
+                resultDiv.style.display = 'block';
+            };
+
+            reader.onerror = function() {
+                alert('Error reading the file');
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html> 
